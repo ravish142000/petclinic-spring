@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: app.ravndclsn.in
+  - host: dev.app.ravndclsn.in
     http:
       paths:
       - path: /
