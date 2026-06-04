@@ -5,53 +5,44 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout scm
+                checkout scm        
             }
         }
 
-        stage('Build JAR') {
+        stage('Build') {
             steps {
                 sh './mvnw clean package'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Docker Build') {
             steps {
                 sh 'docker build -t springclinic:latest .'
             }
         }
 
-        stage('Login to ECR') {
+        stage('Docker Login') {
+            steps {
+                sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 103102677964.dkr.ecr.us-east-1.amazonaws.com'
+            }
+        }
+
+        stage('Docker Push') {
             steps {
                 sh '''
-                aws ecr get-login-password --region us-east-1 | \
-                docker login --username AWS --password-stdin \
-                103102677964.dkr.ecr.us-east-1.amazonaws.com
+                    docker tag springclinic:latest 103102677964.dkr.ecr.us-east-1.amazonaws.com/springclinic:latest 
+                    docker push 103102677964.dkr.ecr.us-east-1.amazonaws.com/springclinic:latest
                 '''
             }
         }
 
-        stage('Tag & Push Image') {
+        stage('Deploy') {
             steps {
                 sh '''
-                docker tag springclinic:latest \
-                103102677964.dkr.ecr.us-east-1.amazonaws.com/springclinic:latest
-
-                docker push \
-                103102677964.dkr.ecr.us-east-1.amazonaws.com/springclinic:latest
+                    kubectl set image deployment/customer-portal customer-portal=103102677964.dkr.ecr.us-east-1.amazonaws.com/springclinic:latest -n dev
+                    kubectl rollout status deployment/customer-portal -n dev
                 '''
-            }
-        }
 
-        stage('Deploy to Dev') {
-            steps {
-                sh '''
-                kubectl set image deployment/customer-portal \
-                customer-portal=103102677964.dkr.ecr.us-east-1.amazonaws.com/springclinic:latest \
-                -n dev
-
-                kubectl rollout status deployment/customer-portal -n dev
-                '''
             }
         }
 
