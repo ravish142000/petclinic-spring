@@ -17,7 +17,7 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t springclinic:latest .'
+                sh 'docker build -t springclinic:v3 .'
             }
         }
 
@@ -30,8 +30,8 @@ pipeline {
         stage('Docker Push') {
             steps {
                 sh '''
-                    docker tag springclinic:latest 103102677964.dkr.ecr.us-east-1.amazonaws.com/springclinic:latest 
-                    docker push 103102677964.dkr.ecr.us-east-1.amazonaws.com/springclinic:latest
+                    docker tag springclinic:latest 103102677964.dkr.ecr.us-east-1.amazonaws.com/springclinic:v3    
+                    docker push 103102677964.dkr.ecr.us-east-1.amazonaws.com/springclinic:v3
                 '''
             }
         }
@@ -39,7 +39,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    kubectl set image deployment/customer-portal customer-portal=103102677964.dkr.ecr.us-east-1.amazonaws.com/springclinic:latest -n dev
+                    kubectl set image deployment/customer-portal customer-portal=103102677964.dkr.ecr.us-east-1.amazonaws.com/springclinic:v3 -n dev
                     kubectl rollout status deployment/customer-portal -n dev
                 '''
 
