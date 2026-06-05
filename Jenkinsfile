@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_REGION = "us-east-1"
-        ECR_REGISTRY = "811822680488.dkr.ecr.us-east-1.amazonaws.com/springclinic"
+        ECR_REGISTRY = "811822680488.dkr.ecr.us-east-1.amazonaws.com"
         IMAGE_NAME = "springclinic"
         ECR_REPO = "${ECR_REGISTRY}/${IMAGE_NAME}"
     }
